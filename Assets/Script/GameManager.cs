@@ -13,6 +13,14 @@ public class GameManager : MonoBehaviour
     Grid grid;
     Board board;
 
+    public enum Game
+    {
+        New,
+        Load,
+    }
+
+    public Game newGame;
+
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);

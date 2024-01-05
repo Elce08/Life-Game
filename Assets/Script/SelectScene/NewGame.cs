@@ -91,6 +91,7 @@ public class NewGame : MonoBehaviour
 
     private void GameStart()
     {
+        gameManager.newGame = GameManager.Game.New;
         SceneManager.LoadScene(1);
     }
 }
