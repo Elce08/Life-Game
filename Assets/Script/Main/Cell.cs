@@ -87,12 +87,13 @@ public class Cell : MonoBehaviour
 
     public Field cellField;
 
-    public List<State> lifeCycle = new();
+    public List<State> lifeCycle;
     int life = 0;
     public int count;  // for count alive neighbors
 
     private void Awake()
     {
+        lifeCycle = new();
         button = GetComponent<Button>();
         status = FindObjectOfType<Status>();
         board = FindObjectOfType<Board>();
@@ -101,25 +102,40 @@ public class Cell : MonoBehaviour
         image.color = Color.clear;
     }
 
-    public void Life()
+    public void PreGame()
+    {
+        lifeCycle.Clear();
+        lifeCycle.Add(CellState);
+    }
+
+    /// <summary>
+    /// Cell in Each Turn
+    /// </summary>
+    /// <param name="turn">Present Turn</param>
+    /// <param name="maxtTurn">Max Turn</param>
+    public void Life(int turn, int maxtTurn)
     {
         count = 0;
         foreach (Cell cell in neighbors) if (cell.lifeCycle[lifeCycle.Count-1] == State.Alive) count++;
-        switch (CellState)
+        if (turn == maxtTurn)
         {
-            case State.Alive:
-                if (count < 2 || count > 3) CellState = State.Die;
-                else life++;
-                break;
-            case State.Die:
-                if (count == 3)
-                {
-                    CellState = State.Alive;
-                    life++;
-                }
-                break;
+            switch (CellState)
+            {
+                case State.Alive:
+                    if (count < 2 || count > 3) CellState = State.Die;
+                    else life++;
+                    break;
+                case State.Die:
+                    if (count == 3)
+                    {
+                        CellState = State.Alive;
+                        life++;
+                    }
+                    break;
+            }
+            lifeCycle.Add(CellState);
         }
-        lifeCycle.Add(CellState);
+        else CellState = lifeCycle[turn];
         if (onStatus) GameStart();
     }
 

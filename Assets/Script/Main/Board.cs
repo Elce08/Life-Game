@@ -7,22 +7,30 @@ using UnityEngine.UI;
 
 public class Board : MonoBehaviour
 {
-    GameManager gameManager;
+    GameManager gameManager;        // Game Total Manage
+
     public GameObject cell;
-    GridLayoutGroup layOut;
-    public Cell[] cells;
-    public float speed = 10.0f;
+    GridLayoutGroup layOut;         // Cell Grid Manage
+    public Cell[] cells;            // Every Cells
+
+    public float speed = 10.0f;     // Turn Speed
     public int Turn;
-    int MaxTurn;
-    TextMeshProUGUI turn;
-    TextMeshProUGUI changeMaxTurn;
-    TMP_InputField changeTurnInput;
-    Button StartSaveButton;
-    TextMeshProUGUI StartSave;
+    int MaxTurn;                    // Max Turn which already computed
+    TextMeshProUGUI turn;           // Turn Display
+    TextMeshProUGUI changeMaxTurn;  // Max Turn Display
+    TMP_InputField changeTurnInput; // Turn Change InputField
+    Button StartSaveButton;         // Game Start & Save Button
+    TextMeshProUGUI StartSave;      // Game Start & Save Button Text
+    /// <summary>
+    /// x: width y: height
+    /// </summary>
     public Vector2 cellSize;
+
+    List<List<Cell.State>> save;
 
     private void Awake()
     {
+        save = new();
         gameManager = FindObjectOfType<GameManager>();
         layOut = GetComponentInChildren<GridLayoutGroup>();
         turn = transform.GetChild(1).GetComponentInChildren<TextMeshProUGUI>();
@@ -32,6 +40,11 @@ public class Board : MonoBehaviour
         StartSave = StartSaveButton.gameObject.GetComponentInChildren<TextMeshProUGUI>();
     }
 
+    /// <summary>
+    /// Setting New Game
+    /// </summary>
+    /// <param name="width">width</param>
+    /// <param name="height">height</param>
     public void GameStart(int width, int height)
     {
         SetCells(width, height);
@@ -40,7 +53,6 @@ public class Board : MonoBehaviour
         turn.text = $"{Turn}";
         changeMaxTurn.text = $"{MaxTurn}";
         changeTurnInput.text = $"{Turn}";
-        foreach (Cell cell in cells) cell.lifeCycle.Clear();
         switch (gameManager.newGame)
         {
             case GameManager.Game.New:
@@ -53,8 +65,13 @@ public class Board : MonoBehaviour
 
     private void NewGameStart()
     {
-        foreach (Cell cell in cells) cell.GameState = Cell.Game.Start;
+        foreach (Cell cell in cells)
+        {
+            cell.PreGame();
+            cell.GameState = Cell.Game.Start;
+        }
         StartSaveButton.onClick.RemoveAllListeners();
+        StartSaveButton.onClick.AddListener(Save);
         StartSave.text = "Save";
         StartCoroutine(Game());
         changeTurnInput.onValueChanged.AddListener(ChangeTurn);
@@ -76,11 +93,16 @@ public class Board : MonoBehaviour
             turn.text = $"{Turn}";
             changeMaxTurn.text = $"{MaxTurn}";
             changeTurnInput.text = $"{Turn}";
-            foreach (Cell cell in cells) cell.Life();
+            foreach (Cell cell in cells) cell.Life(Turn,MaxTurn);
             yield return new WaitForSeconds(speed);
         }
     }
 
+    /// <summary>
+    /// Make Board
+    /// </summary>
+    /// <param name="width">width</param>
+    /// <param name="height">height</param>
     private void SetCells(int width, int height)
     {
         cells = new Cell[width * height];
@@ -117,5 +139,10 @@ public class Board : MonoBehaviour
         {
             cells[i].SetNeighbors(width, i);
         }
+    }
+
+    private void Save()
+    {
+        foreach (Cell cell in cells) save.Add(cell.lifeCycle);
     }
 }
