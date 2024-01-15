@@ -30,15 +30,16 @@ public class Cell : MonoBehaviour
         {
             gameState = value;
             button.onClick.RemoveAllListeners();
-            switch (gameState)
+            button.onClick.AddListener(GameStart);
+            if (gameState == Game.Setting) button.onClick.AddListener(GameSetting);
+            /*switch (gameState)
             {
                 case Game.Setting:
                     button.onClick.AddListener(GameSetting);
                     break;
                 case Game.Start:
-                    button.onClick.AddListener(GameStart);
                     break;
-            }
+            }*/
         }
     }
 
@@ -61,7 +62,7 @@ public class Cell : MonoBehaviour
                 switch (cellState)
                 {
                     case State.Alive:
-                        image.color = Color.white;
+                        image.color = Color.black;
                         break;
                     case State.Die:
                         life = 0;
@@ -218,7 +219,7 @@ public class Cell : MonoBehaviour
         }
     }
 
-    private void GameStart()
+    public void GameStart()
     {
         foreach (Cell cell in cells) cell.onStatus = false;
         onStatus = true;

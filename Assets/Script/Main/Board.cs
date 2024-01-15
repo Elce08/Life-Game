@@ -5,6 +5,12 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
+public class SaveData
+{
+    public int turn;
+    public List<List<Cell.State>> CellData;
+}
+
 public class Board : MonoBehaviour
 {
     GameManager gameManager;        // Game Total Manage
@@ -19,6 +25,7 @@ public class Board : MonoBehaviour
     TextMeshProUGUI turn;           // Turn Display
     TextMeshProUGUI changeMaxTurn;  // Max Turn Display
     TMP_InputField changeTurnInput; // Turn Change InputField
+    TMP_InputField speedInput;      // Speed InputField
     Button StartSaveButton;         // Game Start & Save Button
     TextMeshProUGUI StartSave;      // Game Start & Save Button Text
     /// <summary>
@@ -36,6 +43,7 @@ public class Board : MonoBehaviour
         turn = transform.GetChild(1).GetComponentInChildren<TextMeshProUGUI>();
         changeMaxTurn = transform.GetChild(2).GetComponentInChildren<TextMeshProUGUI>();
         changeTurnInput = transform.GetChild(2).GetComponentInChildren<TMP_InputField>();
+        speedInput = transform.GetChild(3).GetComponent<TMP_InputField>();
         StartSaveButton = transform.GetChild(5).GetComponent<Button>();
         StartSave = StartSaveButton.gameObject.GetComponentInChildren<TextMeshProUGUI>();
     }
@@ -53,6 +61,8 @@ public class Board : MonoBehaviour
         turn.text = $"{Turn}";
         changeMaxTurn.text = $"{MaxTurn}";
         changeTurnInput.text = $"{Turn}";
+        speedInput.text = $"{speed}";
+        speedInput.onEndEdit.AddListener(SetSpeed);
         switch (gameManager.newGame)
         {
             case GameManager.Game.New:
@@ -94,6 +104,7 @@ public class Board : MonoBehaviour
             changeMaxTurn.text = $"{MaxTurn}";
             changeTurnInput.text = $"{Turn}";
             foreach (Cell cell in cells) cell.Life(Turn,MaxTurn);
+            CellCount();
             yield return new WaitForSeconds(speed);
         }
     }
@@ -108,20 +119,20 @@ public class Board : MonoBehaviour
         cells = new Cell[width * height];
         cellSize = new(1000.0f / width, 1000.0f / height);
         layOut.cellSize = cellSize;
-        for(int i = 0; i < height; i++)
+        for (int i = 0; i < height; i++)
         {
-            for(int j = 0; j < width; j++)
+            for (int j = 0; j < width; j++)
             {
                 int index = i * width + j;
                 cells[index] = Instantiate(cell, layOut.transform).GetComponent<Cell>();
                 cells[index].gameObject.name = $"{GameManager.alphabet[j]}{i + 1}";
-                if(i == 0)
+                if (i == 0)
                 {
                     if (j == 0) cells[index].cellField = Cell.Field.UpLeft;
                     else if (j == width - 1) cells[index].cellField = Cell.Field.UpRight;
                     else cells[index].cellField = Cell.Field.Up;
                 }
-                else if(i == height - 1)
+                else if (i == height - 1)
                 {
                     if (j == 0) cells[index].cellField = Cell.Field.DownLeft;
                     else if (j == width - 1) cells[index].cellField = Cell.Field.DownRight;
@@ -139,6 +150,20 @@ public class Board : MonoBehaviour
         {
             cells[i].SetNeighbors(width, i);
         }
+        cells[0].GameStart();
+    }
+
+    private void SetSpeed(string speed)
+    {
+        float.TryParse(speed, out float result);
+        this.speed = result;
+    }
+
+    private void CellCount()
+    {
+        int count = 0;
+        foreach(Cell cell in cells) if(cell.CellState == Cell.State.Alive) count++;
+        if(count == 0) StopAllCoroutines();
     }
 
     private void Save()

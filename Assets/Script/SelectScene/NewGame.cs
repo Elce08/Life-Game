@@ -13,6 +13,7 @@ public class NewGame : MonoBehaviour
     Slider heightSlide;
     Button startButton;
     GameManager gameManager;
+    GameObject select;
 
     private void Awake()
     {
@@ -24,12 +25,13 @@ public class NewGame : MonoBehaviour
         heightInput = height.GetComponentInChildren<TMP_InputField>();
         heightSlide = height.GetComponentInChildren<Slider>();
         startButton = GetComponentInChildren<Button>();
+        select = FindObjectOfType<SelectButton>().gameObject;
     }
 
     private void Start()
     {
-        Width = 30;
-        Height = 30;
+        SetWidth(30);
+        SetHeight(30);
         widthInput.onValueChanged.AddListener(SetWidth);
         heightInput.onValueChanged.AddListener(SetHeight);
         widthSlide.onValueChanged.AddListener(SetWidth);
@@ -38,60 +40,60 @@ public class NewGame : MonoBehaviour
     }
 
     public int width;
-    int Width
+
+    private void SetWidth(int value)
     {
-        get => width;
-        set
-        {
-            if (value < 1) value = 1;
-            if (value > 30) value = 30;
-            width = value;
-            widthInput.text = value.ToString();
-            widthSlide.value = (float)value / 30.0f;
-            gameManager.width = width;
-        }
+        if (value < 1) value = 1;
+        if (value > 30) value = 30;
+        width = value;
+        widthInput.text = value.ToString();
+        widthSlide.value = value / 30.0f;
+        gameManager.width = width;
     }
 
     public int height;
-    int Height
+
+    private void SetHeight(int value)
     {
-        get => height;
-        set
-        {
-            if (value < 1) value = 1;
-            if (value > 30) value = 30;
-            height = value;
-            heightInput.text = value.ToString();
-            heightSlide.value = (float)value / 30.0f;
-            gameManager.height = height;
-        }
+        if (value < 1) value = 1;
+        if (value > 30) value = 30;
+        height = value;
+        heightInput.text = value.ToString();
+        heightSlide.value = value / 30.0f;
+        gameManager.height = height;
     }
 
     private void SetWidth(string width)
     {
         int.TryParse(width, out int result);
-        Width = result;
+        SetWidth(result);
     }
 
     private void SetWidth(float width)
     {
-        Width = (int)(width * 30.0f);
+        SetWidth((int)(width * 30.0f));
     }
 
     private void SetHeight(string height)
     {
         int.TryParse(height, out int result);
-        Height = result;
+        SetHeight(result);
     }
 
     private void SetHeight(float height)
     {
-        Height = (int)(height * 30.0f);
+        SetHeight((int)(height * 30.0f));
     }
 
     private void GameStart()
     {
         gameManager.newGame = GameManager.Game.New;
         SceneManager.LoadScene(1);
+    }
+
+    public void Return()
+    {
+        select.SetActive(true);
+        gameObject.SetActive(false);
     }
 }

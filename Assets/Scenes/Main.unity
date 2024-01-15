@@ -1356,6 +1356,7 @@ MonoBehaviour:
   cells: []
   speed: 0.5
   Turn: 0
+  cellSize: {x: 0, y: 0}
 --- !u!1 &958197717
 GameObject:
   m_ObjectHideFlags: 0
