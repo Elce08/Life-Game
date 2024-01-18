@@ -8,7 +8,9 @@ public class SaveData
     public int turn;
     public int width;
     public int height;
-    public List<List<Cell.State>> CellData = new();
+    public List<Cell.State[]> cellDatas;
+    // public List<Cell.State> CellData = new();
+    // public List<List<Cell.State>> CellData = new();
 }
 
 public class GameManager : MonoBehaviour
@@ -24,7 +26,7 @@ public class GameManager : MonoBehaviour
     PlayerInputSystem input;
 
     public GameObject saveLoad;
-    GameObject menu;
+    Menu menu;
     GameObject selectButton;
     NewGame newMenu;
 
@@ -55,27 +57,26 @@ public class GameManager : MonoBehaviour
         input = new();
         Transform canvas = gameObject.transform.GetChild(0);
         saveLoad = canvas.GetChild(0).gameObject;
-        menu = canvas.GetChild(1).gameObject;
+        menu = canvas.GetChild(1).GetComponent<Menu>();
         saveLoad.SetActive(false);
-        menu.SetActive(false);
+        menu.gameObject.SetActive(false);
     }
 
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoad;
         input.Menu.Enable();
-        input.Menu.Menu.performed += Menu_performed;
     }
 
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoad;
-        input.Menu.Menu.performed -= Menu_performed;
         input.Menu.Disable();
     }
 
     private void OnSceneLoad(UnityEngine.SceneManagement.Scene scene, LoadSceneMode loadScene)
     {
+        input.Menu.Menu.performed -= Menu_performed;
         currentScene = scene.name;
         MenuState = GameState.Play;
         switch (scene.name)
@@ -88,12 +89,14 @@ public class GameManager : MonoBehaviour
                 grid.SetVertical(height);
                 board = FindObjectOfType<Board>();
                 board.GameStart(width, height);
+        input.Menu.Menu.performed += Menu_performed;
                 break;
             case "Select":
                 grid = null;
                 board = null;
                 newMenu = FindObjectOfType<NewGame>();
                 selectButton = FindObjectOfType<SelectButton>().gameObject;
+                input.Menu.Menu.performed += Menu_performed;
                 break;
         }
     }
@@ -103,22 +106,31 @@ public class GameManager : MonoBehaviour
         switch (MenuState)
         {
             case GameState.Play:
+                Time.timeScale = 0;
                 MenuState = GameState.Menu;
-                menu.SetActive(true);
+                OnMenu();
                 break;
             case GameState.Menu:
+                Time.timeScale = 1;
                 MenuState = GameState.Play;
-                menu.SetActive(false);
+                menu.gameObject.SetActive(false);
                 break;
             case GameState.SaveLoadMenu:
-                MenuState = GameState.Play;
                 saveLoad.SetActive(false);
                 if (selectButton != null) selectButton.SetActive(true);
+                MenuState = GameState.Play;
                 break;
             case GameState.NewMenu:
-                MenuState = GameState.Play;
                 if (newMenu != null) newMenu.Return();
+                MenuState = GameState.Play;
                 break;
         }
+    }
+
+    private void OnMenu()
+    {
+        menu.gameObject.SetActive(true);
+        if(currentScene != "Main") menu.buttons[1].gameObject.SetActive(false);
+        else menu.buttons[1].gameObject.SetActive(true);
     }
 }

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Linq;
+using Unity.VisualScripting;
 
 public class SaveLoad : MonoBehaviour
 {
@@ -94,9 +96,13 @@ public class SaveLoad : MonoBehaviour
             width = gameManager.width,
             height = gameManager.height,
         };
-        foreach (Cell cell in board.cells) saveData.CellData.Add(cell.lifeCycle);
-
-        if (saveData.CellData.Count > 0) Debug.Log("Success");
+        saveData.cellDatas = new();
+        for(int i = 0; i < board.cells.Length; i++)
+        {
+            saveData.cellDatas.Add(null);
+            saveData.cellDatas[i] = new Cell.State[board.Turn];
+            for (int j = 0; j < saveData.cellDatas[i].Length; j++) saveData.cellDatas[i][j] = board.cells[i].lifeCycle[j];
+        }
 
         string jsonData = JsonUtility.ToJson(saveData, true);
         File.WriteAllText(paths[Num-1],jsonData);
@@ -105,10 +111,6 @@ public class SaveLoad : MonoBehaviour
         Num = 0;
         Check.SetActive(false);
         gameObject.SetActive(false);
-
-        List<List<Cell.State>> testData = new();
-        SaveData saved = new();
-        string loadJson = JsonUtility.FromJson<string>(jsonData);
     }
 
     private void JsonLoad()

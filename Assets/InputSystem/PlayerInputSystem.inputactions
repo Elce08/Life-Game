@@ -28,6 +28,45 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Start",
+            "id": "db148a49-109a-4d44-9e65-e0762584b2bd",
+            "actions": [
+                {
+                    "name": "Start",
+                    "type": "Button",
+                    "id": "d86b5a12-1673-4997-a913-2e16447ea9a0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "88b9e561-c5a4-49b7-b5c1-c589e2182940",
+                    "path": "<Keyboard>/anyKey",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Start",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c8892a16-a174-432e-bfb7-2c913eb25213",
+                    "path": "<Mouse>/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Start",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

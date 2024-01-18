@@ -50,6 +50,45 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Start"",
+            ""id"": ""db148a49-109a-4d44-9e65-e0762584b2bd"",
+            ""actions"": [
+                {
+                    ""name"": ""Start"",
+                    ""type"": ""Button"",
+                    ""id"": ""d86b5a12-1673-4997-a913-2e16447ea9a0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""88b9e561-c5a4-49b7-b5c1-c589e2182940"",
+                    ""path"": ""<Keyboard>/anyKey"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Start"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c8892a16-a174-432e-bfb7-2c913eb25213"",
+                    ""path"": ""<Mouse>/press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Start"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -57,6 +96,9 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         // Menu
         m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
         m_Menu_Menu = m_Menu.FindAction("Menu", throwIfNotFound: true);
+        // Start
+        m_Start = asset.FindActionMap("Start", throwIfNotFound: true);
+        m_Start_Start = m_Start.FindAction("Start", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -160,8 +202,58 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         }
     }
     public MenuActions @Menu => new MenuActions(this);
+
+    // Start
+    private readonly InputActionMap m_Start;
+    private List<IStartActions> m_StartActionsCallbackInterfaces = new List<IStartActions>();
+    private readonly InputAction m_Start_Start;
+    public struct StartActions
+    {
+        private @PlayerInputSystem m_Wrapper;
+        public StartActions(@PlayerInputSystem wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Start => m_Wrapper.m_Start_Start;
+        public InputActionMap Get() { return m_Wrapper.m_Start; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(StartActions set) { return set.Get(); }
+        public void AddCallbacks(IStartActions instance)
+        {
+            if (instance == null || m_Wrapper.m_StartActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_StartActionsCallbackInterfaces.Add(instance);
+            @Start.started += instance.OnStart;
+            @Start.performed += instance.OnStart;
+            @Start.canceled += instance.OnStart;
+        }
+
+        private void UnregisterCallbacks(IStartActions instance)
+        {
+            @Start.started -= instance.OnStart;
+            @Start.performed -= instance.OnStart;
+            @Start.canceled -= instance.OnStart;
+        }
+
+        public void RemoveCallbacks(IStartActions instance)
+        {
+            if (m_Wrapper.m_StartActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IStartActions instance)
+        {
+            foreach (var item in m_Wrapper.m_StartActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_StartActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public StartActions @Start => new StartActions(this);
     public interface IMenuActions
     {
         void OnMenu(InputAction.CallbackContext context);
+    }
+    public interface IStartActions
+    {
+        void OnStart(InputAction.CallbackContext context);
     }
 }
