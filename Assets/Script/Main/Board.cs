@@ -5,12 +5,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SaveData
-{
-    public int turn;
-    public List<List<Cell.State>> CellData;
-}
-
 public class Board : MonoBehaviour
 {
     GameManager gameManager;        // Game Total Manage
@@ -33,11 +27,8 @@ public class Board : MonoBehaviour
     /// </summary>
     public Vector2 cellSize;
 
-    List<List<Cell.State>> save;
-
     private void Awake()
     {
-        save = new();
         gameManager = FindObjectOfType<GameManager>();
         layOut = GetComponentInChildren<GridLayoutGroup>();
         turn = transform.GetChild(1).GetComponentInChildren<TextMeshProUGUI>();
@@ -166,8 +157,9 @@ public class Board : MonoBehaviour
         if(count == 0) StopAllCoroutines();
     }
 
-    private void Save()
+    public void Save()
     {
-        foreach (Cell cell in cells) save.Add(cell.lifeCycle);
+        gameManager.saveLoad.SetActive(true);
+        Time.timeScale = 0;
     }
 }

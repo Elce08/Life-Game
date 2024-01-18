@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+public class SaveData
+{
+    public int turn;
+    public int width;
+    public int height;
+    public List<List<Cell.State>> CellData = new();
+}
+
 public class GameManager : MonoBehaviour
 {
     public static List<string> alphabet = new() {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
@@ -19,6 +27,8 @@ public class GameManager : MonoBehaviour
     GameObject menu;
     GameObject selectButton;
     NewGame newMenu;
+
+    public string currentScene;
 
     public enum GameState
     {
@@ -66,6 +76,7 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoad(UnityEngine.SceneManagement.Scene scene, LoadSceneMode loadScene)
     {
+        currentScene = scene.name;
         MenuState = GameState.Play;
         switch (scene.name)
         {
