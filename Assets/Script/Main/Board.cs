@@ -61,6 +61,10 @@ public class Board : MonoBehaviour
                 StartSave.text = "Start";
                 StartSaveButton.onClick.AddListener(NewGameStart);
                 break;
+            case GameManager.Game.Load:
+                LoadGameStart();
+                Time.timeScale = 0;
+                break;
         }
     }
 
@@ -72,6 +76,21 @@ public class Board : MonoBehaviour
             cell.GameState = Cell.Game.Start;
         }
         StartSaveButton.onClick.RemoveAllListeners();
+        StartSaveButton.onClick.AddListener(Save);
+        StartSave.text = "Save";
+        StartCoroutine(Game());
+        changeTurnInput.onValueChanged.AddListener(ChangeTurn);
+    }
+
+    private void LoadGameStart()
+    {
+        foreach(Cell cell in cells)
+        {
+            cell.PreGame();
+            cell.GameState = Cell.Game.Start;
+        }
+        Turn = gameManager.turn;
+        MaxTurn = gameManager.turn;
         StartSaveButton.onClick.AddListener(Save);
         StartSave.text = "Save";
         StartCoroutine(Game());
@@ -116,6 +135,7 @@ public class Board : MonoBehaviour
             {
                 int index = i * width + j;
                 cells[index] = Instantiate(cell, layOut.transform).GetComponent<Cell>();
+                cells[index].index = index;
                 cells[index].gameObject.name = $"{GameManager.alphabet[j]}{i + 1}";
                 if (i == 0)
                 {
@@ -159,6 +179,7 @@ public class Board : MonoBehaviour
 
     public void Save()
     {
+        gameManager.MenuState = GameManager.GameState.SaveLoadMenu;
         gameManager.saveLoad.SetActive(true);
         Time.timeScale = 0;
     }

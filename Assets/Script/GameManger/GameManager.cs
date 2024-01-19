@@ -5,12 +5,12 @@ using UnityEngine.SceneManagement;
 
 public class SaveData
 {
-    public int turn;
-    public int width;
-    public int height;
-    public List<Cell.State[]> cellDatas;
+    public int turn = 0;
+    public int width = 0;
+    public int height = 0;
+    // public List<Cell.State[]> cellDatas;
     // public List<Cell.State> CellData = new();
-    // public List<List<Cell.State>> CellData = new();
+    public List<List<Cell.State>> CellData = new();
 }
 
 public class GameManager : MonoBehaviour
@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     public static List<string> alphabet = new() {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
                                             "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
 
+    public int turn = 0;
     public int width;
     public int height;
     Grid grid;
@@ -116,6 +117,7 @@ public class GameManager : MonoBehaviour
                 menu.gameObject.SetActive(false);
                 break;
             case GameState.SaveLoadMenu:
+                Time.timeScale = 1;
                 saveLoad.SetActive(false);
                 if (selectButton != null) selectButton.SetActive(true);
                 MenuState = GameState.Play;

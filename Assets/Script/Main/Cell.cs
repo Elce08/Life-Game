@@ -12,8 +12,11 @@ public class Cell : MonoBehaviour
     Board board;
     Cell[] cells;
     List<Cell> neighbors;
+    GameManager gameManager;
+    SaveLoad saveLoad;
     public bool onStatus;
     public Image image;
+    public int index;
 
     public enum Game
     {
@@ -94,6 +97,8 @@ public class Cell : MonoBehaviour
 
     private void Awake()
     {
+        gameManager = FindObjectOfType<GameManager>();
+        saveLoad = gameManager.GetComponentInChildren<SaveLoad>();
         lifeCycle = new();
         button = GetComponent<Button>();
         status = FindObjectOfType<Status>();
@@ -106,7 +111,12 @@ public class Cell : MonoBehaviour
     public void PreGame()
     {
         lifeCycle.Clear();
-        lifeCycle.Add(CellState);
+        if (gameManager.newGame == GameManager.Game.Load)
+        {
+            // lifeCycle = saveLoad.saveDatas[saveLoad.Loaded].CellData[index];
+            foreach (State state in saveLoad.saveDatas[saveLoad.Loaded].CellData[index]) lifeCycle.Add(state);
+        }
+        else lifeCycle.Add(CellState);
     }
 
     /// <summary>
@@ -117,7 +127,7 @@ public class Cell : MonoBehaviour
     public void Life(int turn, int maxtTurn)
     {
         count = 0;
-        foreach (Cell cell in neighbors) if (cell.lifeCycle[lifeCycle.Count-1] == State.Alive) count++;
+        foreach (Cell cell in neighbors) if (cell.lifeCycle[lifeCycle.Count-1] == 0) count++;
         if (turn == maxtTurn)
         {
             switch (CellState)
