@@ -8,9 +8,7 @@ public class SaveData
     public int turn = 0;
     public int width = 0;
     public int height = 0;
-    // public List<Cell.State[]> cellDatas;
-    // public List<Cell.State> CellData = new();
-    public List<List<Cell.State>> CellData = new();
+    public List<int> start;
 }
 
 public class GameManager : MonoBehaviour
@@ -26,12 +24,14 @@ public class GameManager : MonoBehaviour
 
     PlayerInputSystem input;
 
-    public GameObject saveLoad;
+    public SaveLoad saveLoad;
     Menu menu;
     GameObject selectButton;
     NewGame newMenu;
 
     public string currentScene;
+
+    public List<int> start;
 
     public enum GameState
     {
@@ -53,13 +53,14 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        start = new();
         DontDestroyOnLoad(gameObject);
         MenuState = GameState.Play;
         input = new();
         Transform canvas = gameObject.transform.GetChild(0);
-        saveLoad = canvas.GetChild(0).gameObject;
+        saveLoad = canvas.GetChild(0).GetComponent<SaveLoad>();
         menu = canvas.GetChild(1).GetComponent<Menu>();
-        saveLoad.SetActive(false);
+        saveLoad.gameObject.SetActive(false);
         menu.gameObject.SetActive(false);
     }
 
@@ -118,7 +119,7 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.SaveLoadMenu:
                 Time.timeScale = 1;
-                saveLoad.SetActive(false);
+                saveLoad.gameObject.SetActive(false);
                 if (selectButton != null) selectButton.SetActive(true);
                 MenuState = GameState.Play;
                 break;

@@ -35,7 +35,7 @@ public class SelectButton : MonoBehaviour
     private void LoadMenu()
     {
         gameManager.MenuState = GameManager.GameState.SaveLoadMenu;
-        gameManager.saveLoad.SetActive(true);
+        gameManager.saveLoad.gameObject.SetActive(true);
         gameObject.SetActive(false);
     }
 }

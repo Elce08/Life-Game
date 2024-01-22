@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -27,8 +28,11 @@ public class Board : MonoBehaviour
     /// </summary>
     public Vector2 cellSize;
 
+    public List<int> start;
+
     private void Awake()
     {
+        start = new();
         gameManager = FindObjectOfType<GameManager>();
         layOut = GetComponentInChildren<GridLayoutGroup>();
         turn = transform.GetChild(1).GetComponentInChildren<TextMeshProUGUI>();
@@ -62,8 +66,8 @@ public class Board : MonoBehaviour
                 StartSaveButton.onClick.AddListener(NewGameStart);
                 break;
             case GameManager.Game.Load:
+                foreach (Cell cell in cells) cell.GameState = Cell.Game.Start;
                 LoadGameStart();
-                Time.timeScale = 0;
                 break;
         }
     }
@@ -87,10 +91,8 @@ public class Board : MonoBehaviour
         foreach(Cell cell in cells)
         {
             cell.PreGame();
-            cell.GameState = Cell.Game.Start;
         }
-        Turn = gameManager.turn;
-        MaxTurn = gameManager.turn;
+        StartSaveButton.onClick.RemoveAllListeners();
         StartSaveButton.onClick.AddListener(Save);
         StartSave.text = "Save";
         StartCoroutine(Game());
@@ -180,7 +182,7 @@ public class Board : MonoBehaviour
     public void Save()
     {
         gameManager.MenuState = GameManager.GameState.SaveLoadMenu;
-        gameManager.saveLoad.SetActive(true);
+        gameManager.saveLoad.gameObject.SetActive(true);
         Time.timeScale = 0;
     }
 }

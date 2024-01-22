@@ -13,7 +13,6 @@ public class Cell : MonoBehaviour
     Cell[] cells;
     List<Cell> neighbors;
     GameManager gameManager;
-    SaveLoad saveLoad;
     public bool onStatus;
     public Image image;
     public int index;
@@ -98,7 +97,6 @@ public class Cell : MonoBehaviour
     private void Awake()
     {
         gameManager = FindObjectOfType<GameManager>();
-        saveLoad = gameManager.GetComponentInChildren<SaveLoad>();
         lifeCycle = new();
         button = GetComponent<Button>();
         status = FindObjectOfType<Status>();
@@ -113,10 +111,11 @@ public class Cell : MonoBehaviour
         lifeCycle.Clear();
         if (gameManager.newGame == GameManager.Game.Load)
         {
-            // lifeCycle = saveLoad.saveDatas[saveLoad.Loaded].CellData[index];
-            foreach (State state in saveLoad.saveDatas[saveLoad.Loaded].CellData[index]) lifeCycle.Add(state);
+            if (gameManager.start.Contains(index)) CellState = State.Alive;
+            else CellState = State.Die;
         }
-        else lifeCycle.Add(CellState);
+        else if (CellState == State.Alive) board.start.Add(index);
+        lifeCycle.Add(CellState);
     }
 
     /// <summary>

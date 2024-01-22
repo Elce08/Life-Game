@@ -44,15 +44,12 @@ public class SaveLoad : MonoBehaviour
 
     private void Start()
     {
-        XmlSerializer serializer = new(typeof(SaveData));
-        FileStream fileStream;
         for(int i = 0; i < paths.Length; i++)
         {
-            paths[i] = Path.Combine(Application.dataPath + "/Datas/", $"Data{i}.xml");
-            fileStream = new(paths[i], FileMode.Open);
-            saveDatas[i] = serializer.Deserialize(fileStream) as SaveData;
-            fileStream.Close();
-            if (saveDatas[i].turn != 1)texts[2 * i + 1].text = $"MaxTurn : {saveDatas[i].turn}";
+            paths[i] = Path.Combine(Application.dataPath + "/Datas/", $"Data{i}.json");
+            string loadJson = File.ReadAllText(paths[i]);
+            saveDatas[i] = JsonUtility.FromJson<SaveData>(loadJson);
+            if (saveDatas[i] != null) texts[2 * i + 1].text = $"turn : {saveDatas[i].turn}";
             else texts[2 * i + 1].text = "None";
         }
     }
@@ -99,7 +96,7 @@ public class SaveLoad : MonoBehaviour
         {
             case "Select":
                 texts[10].text = "Load";
-                if (saveDatas[Num-1].turn == 1) Check.SetActive(false);
+                if (saveDatas[Num-1] == null) Check.SetActive(false);
                 else
                 {
                     Check.SetActive(true);
@@ -122,29 +119,14 @@ public class SaveLoad : MonoBehaviour
             turn = board.Turn,
             width = gameManager.width,
             height = gameManager.height,
-            CellData = new()
+            start = new()
         };
-        foreach (Cell cell in board.cells) saveDatas[Num-1].CellData.Add(cell.lifeCycle);
+        foreach (int index in board.start) saveDatas[Num - 1].start.Add(index);
 
-        XmlSerializer serializer = new(typeof(SaveData));
+        string jsonData = JsonUtility.ToJson(saveDatas[Num-1], true);
+        File.WriteAllText(paths[Num - 1], jsonData);
 
-        FileStream fileStream = new(paths[Num-1],FileMode.Create);
-        serializer.Serialize(fileStream, saveDatas[Num-1]);
-        fileStream.Close();
-
-        /*saveData.cellDatas = new();
-        for(int i = 0; i < board.cells.Length; i++)
-        {
-            saveData.cellDatas.Add(null);
-            saveData.cellDatas[i] = new Cell.State[board.Turn];
-            for (int j = 0; j < saveData.cellDatas[i].Length; j++) saveData.cellDatas[i][j] = board.cells[i].lifeCycle[j];
-        }*/
-
-        /*string jsonData = JsonUtility.ToJson(saveData, true);
-        File.WriteAllText(paths[Num-1],jsonData);
-
-        Time.timeScale = 1;*/
-        texts[2 * (Num - 1) + 1].text = $"MaxTurn : {saveDatas[Num - 1].turn}";
+        texts[2 * (Num - 1) + 1].text = $"Turn : {saveDatas[Num - 1].turn}";
         Num = 0;
         Check.SetActive(false);
     }
@@ -152,12 +134,14 @@ public class SaveLoad : MonoBehaviour
     private void JsonLoad()
     {
         Loaded = Num - 1;
-        gameManager.turn = saveDatas[Loaded].turn;
+        gameManager.turn = 0;
         gameManager.width = saveDatas[Loaded].width;
-        gameManager.height = saveDatas[Num - 1].height;
+        gameManager.height = saveDatas[Loaded].height;
         gameManager.newGame = GameManager.Game.Load;
+        gameManager.start = saveDatas[Loaded].start;
         SceneManager.LoadScene(1);
         gameManager.MenuState = GameManager.GameState.Play;
+        board = FindObjectOfType<Board>();
         Check.SetActive(false);
         gameObject.SetActive(false);
     }
