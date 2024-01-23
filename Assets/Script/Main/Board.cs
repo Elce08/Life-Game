@@ -66,8 +66,13 @@ public class Board : MonoBehaviour
                 StartSaveButton.onClick.AddListener(NewGameStart);
                 break;
             case GameManager.Game.Load:
-                foreach (Cell cell in cells) cell.GameState = Cell.Game.Start;
-                LoadGameStart();
+                foreach (Cell cell in cells)
+                {
+                    cell.GameState = Cell.Game.Start;
+                    cell.PreGame();
+                }
+                StartSave.text = "Start";
+                StartSaveButton.onClick.AddListener(LoadGameStart);
                 break;
         }
     }
@@ -88,10 +93,6 @@ public class Board : MonoBehaviour
 
     private void LoadGameStart()
     {
-        foreach(Cell cell in cells)
-        {
-            cell.PreGame();
-        }
         StartSaveButton.onClick.RemoveAllListeners();
         StartSaveButton.onClick.AddListener(Save);
         StartSave.text = "Save";
